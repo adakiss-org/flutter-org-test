@@ -20,29 +20,49 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
 
-      - name: Build Android APK
-        run: flutter build apk --release
+      #- name: Build Android APK
+      #  run: flutter build apk --release
 
-      - name: Build Android AAB
-        run: flutter build appbundle --release
+      #- name: Build Android AAB
+      #  run: flutter build appbundle --release
 
-      - name: Build iOS (Simulator)
-        run: flutter build ios --no-codesign
+      # Set up Ruby (for Fastlane)
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1
 
-      - name: Upload Android APK
+      # Install Fastlane
+      - name: Install Fastlane
+        run: sudo gem install fastlane -NV
+
+      # Set up Signing
+      - name: Set up signing certificates and provisioning profiles
+        run: |
+          mkdir -p ~/certs
+          echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > ~/certs/ios_certificate.p12
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/certs/profile.mobileprovision
+
+
+      # Run Fastlane
+      - name: Build iOS IPA with Fastlane
+        run: fastlane ios build
+
+      #- name: Upload Android APK
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: app-release.apk
+      #    path: build/app/outputs/flutter-apk/app-release.apk
+
+      #- name: Upload Android AAB
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: app-release.aab
+      #    path: build/app/outputs/bundle/release/app-release.aab
+
+      # Upload iOS IPA artifact
+      - name: Upload iOS IPA
         uses: actions/upload-artifact@v4
         with:
-          name: app-release.apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-
-      - name: Upload Android AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release.aab
-          path: build/app/outputs/bundle/release/app-release.aab
-
-      - name: Upload iOS Build (no IPA)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build
-          path: build/ios/iphoneos
+          name: ios-release.ipa
+          path: build/ios/ipa/*.ipa
