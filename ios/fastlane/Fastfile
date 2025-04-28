@@ -1,18 +1,15 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Build the iOS app"
+  desc "Build iOS app with Match"
   lane :build do
-    match(type: "appstore") # Optional: use match to pull certificates/profiles automatically
+    match(
+      type: "appstore",
+      readonly: true # CI/CD should use readonly mode
+    )
     build_app(
-      scheme: "Runner", # Flutter uses Runner.xcworkspace
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          ENV["IOS_BUNDLE_IDENTIFIER"] => "YourProvisioningProfileName"
-        },
-        teamID: ENV["IOS_TEAM_ID"]
-      }
+      scheme: "Runner",
+      export_method: "app-store"
     )
   end
 end

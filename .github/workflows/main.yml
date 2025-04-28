@@ -20,33 +20,43 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
 
+      - name: Set up keychain and certificate
+        run: |
+          # Create a temporary keychain
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings build.keychain
+
+          # Decode and import the certificate
+          echo "$IOS_CERTIFICATE_BASE64" | base64 --decode > certificate.p12
+          security import certificate.p12 -P "$IOS_CERTIFICATE_PASSWORD" -A
+
+          # Allow codesign to access the keychain
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+
+      - name: Install provisioning profile
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/adhoc.mobileprovision
+
+      - name: Build IPA
+        run: |
+          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+
+
+      # Upload iOS IPA artifact
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-adhoc-ipa
+          path: build/ios/ipa/*.ipa
+
       #- name: Build Android APK
       #  run: flutter build apk --release
 
       #- name: Build Android AAB
       #  run: flutter build appbundle --release
-
-      # Set up Ruby (for Fastlane)
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.1
-
-      # Install Fastlane
-      - name: Install Fastlane
-        run: sudo gem install fastlane -NV
-
-      # Set up Signing
-      - name: Set up signing certificates and provisioning profiles
-        run: |
-          mkdir -p ~/certs
-          echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > ~/certs/ios_certificate.p12
-          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/certs/profile.mobileprovision
-
-
-      # Run Fastlane
-      - name: Build iOS IPA with Fastlane
-        run: fastlane ios build
 
       #- name: Upload Android APK
       #  uses: actions/upload-artifact@v4
@@ -59,10 +69,3 @@ jobs:
       #  with:
       #    name: app-release.aab
       #    path: build/app/outputs/bundle/release/app-release.aab
-
-      # Upload iOS IPA artifact
-      - name: Upload iOS IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-release.ipa
-          path: build/ios/ipa/*.ipa
