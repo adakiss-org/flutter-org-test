@@ -17,8 +17,8 @@ jobs:
           flutter-version: '3.29.3'  # Your Flutter version
           cache: true
 
-      - name: Install Flutter dependencies
-        run: flutter pub get
+      #- name: Install Flutter dependencies
+      #  run: flutter pub get
 
       - name: Set up keychain and certificate
         run: |
@@ -29,7 +29,8 @@ jobs:
           security set-keychain-settings build.keychain
 
           # Decode and import the certificate
-          echo "$IOS_CERTIFICATE_BASE64" | base64 --decode > certificate.p12
+          echo $IOS_CERTIFICATE_BASE64 | base64 --decode
+          echo $IOS_CERTIFICATE_BASE64 | base64 --decode > certificate.p12
           security import certificate.p12 -P "$IOS_CERTIFICATE_PASSWORD" -A
 
           # Allow codesign to access the keychain
@@ -40,9 +41,9 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/adhoc.mobileprovision
 
-      - name: Build IPA
-        run: |
-          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+      #- name: Build IPA
+      #  run: |
+      #    flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
 
 
       # Upload iOS IPA artifact
