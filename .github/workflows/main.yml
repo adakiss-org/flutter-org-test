@@ -11,35 +11,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.29.3'  # Your Flutter version
-          cache: true
+      #- name: Set up Flutter
+      #  uses: subosito/flutter-action@v2
+      #  with:
+      #    flutter-version: '3.29.3'  # Your Flutter version
+      #    cache: true
 
       #- name: Install Flutter dependencies
       #  run: flutter pub get
 
-      - name: Set up keychain and certificate
+      - name: Print info
         run: |
-          # Create a temporary keychain
-          security create-keychain -p "" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security set-keychain-settings build.keychain
+          echo $IOS_BUNDLE_IDENTIFIER 
 
-          # Decode and import the certificate
-          echo $IOS_CERTIFICATE_BASE64 | base64 --decode
-          echo $IOS_CERTIFICATE_BASE64 | base64 --decode > certificate.p12
-          security import certificate.p12 -P "$IOS_CERTIFICATE_PASSWORD" -A
+      #- name: Set up keychain and certificate
+      #  run: |
+      #    # Create a temporary keychain
+      #    security create-keychain -p "" build.keychain
+      #    security default-keychain -s build.keychain
+      #    security unlock-keychain -p "" build.keychain
+      #    security set-keychain-settings build.keychain
 
-          # Allow codesign to access the keychain
-          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+      #    # Decode and import the certificate
+      #    echo $IOS_CERTIFICATE_BASE64 | base64 --decode
+      #    echo $IOS_CERTIFICATE_BASE64 | base64 --decode > certificate.p12
+      #    security import certificate.p12 -P "$IOS_CERTIFICATE_PASSWORD" -A
 
-      - name: Install provisioning profile
-        run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/adhoc.mobileprovision
+      #    # Allow codesign to access the keychain
+      #    security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+
+      #- name: Install provisioning profile
+      #  run: |
+      #    mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+      #    echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/adhoc.mobileprovision
 
       #- name: Build IPA
       #  run: |
@@ -47,11 +51,11 @@ jobs:
 
 
       # Upload iOS IPA artifact
-      - name: Upload IPA artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-adhoc-ipa
-          path: build/ios/ipa/*.ipa
+      #- name: Upload IPA artifact
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: ios-adhoc-ipa
+      #    path: build/ios/ipa/*.ipa
 
       #- name: Build Android APK
       #  run: flutter build apk --release
