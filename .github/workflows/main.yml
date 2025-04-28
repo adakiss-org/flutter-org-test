@@ -21,6 +21,8 @@ jobs:
       #  run: flutter pub get
 
       - name: Print info
+        env:
+          IOS_BUNDLE_IDENTIFIER: ${{ secrets.IOS_BUNDLE_IDENTIFIER }}
         run: |
           echo $IOS_BUNDLE_IDENTIFIER 
 
