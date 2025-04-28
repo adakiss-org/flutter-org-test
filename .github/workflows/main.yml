@@ -33,7 +33,7 @@ jobs:
 
           # Decode and import the certificate
           echo $IOS_CERTIFICATE_BASE64 | base64 --decode > certificate.p12
-          security import certificate.p12 -P "$IOS_CERTIFICATE_PASSWORD" -A
+          security import certificate.p12 -P $IOS_CERTIFICATE_PASSWORD -A
 
           # Allow codesign to access the keychain
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
