@@ -38,10 +38,12 @@ jobs:
           # Allow codesign to access the keychain
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
 
-      #- name: Install provisioning profile
-      #  run: |
-      #    mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-      #    echo "$PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/adhoc.mobileprovision
+      - name: Install provisioning profile
+        env:
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/adhoc.mobileprovision
 
       #- name: Build IPA
       #  run: |
