@@ -8,7 +8,7 @@
   <key>provisioningProfiles</key>
   <dict>
     <key>hu.wieldy.app</key> <!-- replace with your app bundle ID -->
-    <string>adhoc</string>
+    <string>testprofile</string>
   </dict>
   <key>signingStyle</key>
   <string>manual</string>
