@@ -46,7 +46,7 @@ jobs:
 
       - name: Build IPA
         run: |
-          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+          flutter build ipa --release --export-options-plist=./ios-nonexstint/Runner/ExportOptions.plist
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
