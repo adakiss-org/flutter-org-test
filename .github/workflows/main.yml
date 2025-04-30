@@ -95,7 +95,7 @@ jobs:
     steps:
     
     # Retrieve ipa file from GitHub artifacts
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Get release-ipa from artifacts
       uses: actions/download-artifact@v4
       with:
