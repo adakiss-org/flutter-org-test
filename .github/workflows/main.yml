@@ -72,8 +72,10 @@ jobs:
           EOF
 
       - name: Build IPA
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
         run: |
-          flutter build ipa --release --export-options-plist=./ios/Runner/ExportOptions.plist
+          flutter build ipa --release --export-options-plist=./ios/Runner/ExportOptions.plist --build-number=$BUILD_NUMBER
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
@@ -103,7 +105,9 @@ jobs:
       run: flutter pub get
 
     - name: Build Android APK
-      run: flutter build apk --release
+      env:
+        BUILD_NUMBER: ${{ github.run_number }}
+      run: flutter build apk --release --build-number=$BUILD_NUMBER
 
     - name: Upload Adnroid APK artifact
       uses: actions/upload-artifact@v4
