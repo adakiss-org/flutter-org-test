@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-ios:
     runs-on: macos-latest
 
     steps:
@@ -87,10 +87,34 @@ jobs:
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
           rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
 
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.29.3'
+        cache: true
+
+    - name: Install Flutter dependencies
+      run: flutter pub get
+
+    - name: Build Android AAB
+      run: flutter build appbundle --release
+
+    - name: Upload Android AAB artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-aab
+        path: build/app/outputs/bundle/release/app-release.aab
+
   # Release job, upload the ipa to Firebase App Distribution
-  release:
-    name: Release ipa to Firebase
-    needs: [ build ]
+  release-ipa:
+    name: Release IPA to Firebase
+    needs: [ build-ios ]
     runs-on: ubuntu-latest
     steps:
     
