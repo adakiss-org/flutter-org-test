@@ -102,14 +102,24 @@ jobs:
     - name: Install Flutter dependencies
       run: flutter pub get
 
-    - name: Build Android AAB
-      run: flutter build appbundle --release
+    - name: Build Android APK
+      run: flutter build apk --release
 
-    - name: Upload Android AAB artifact
+    - name: Upload Adnroid APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: release-aab
-        path: build/app/outputs/bundle/release/app-release.aab
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+    # To upload AAB to Firebase, a Google Play account needs to be linked to the Firebase account
+    #- name: Build Android AAB
+    #  run: flutter build appbundle --release
+
+    #- name: Upload Android AAB artifact
+    #  uses: actions/upload-artifact@v4
+    #  with:
+    #    name: release-aab
+    #    path: build/app/outputs/bundle/release/app-release.aab
 
   release-ipa:
     name: Release IPA to Firebase
@@ -132,7 +142,7 @@ jobs:
         file: app.ipa
 
   release-android:
-    name: Release AAB to Firebase
+    name: Release AAB/APK to Firebase
     needs: [ build-android ]
     runs-on: ubuntu-latest
     steps:
@@ -141,7 +151,7 @@ jobs:
     - name: Get release-ipa from artifacts
       uses: actions/download-artifact@v4
       with:
-        name: release-aab
+        name: release-apk # OR release-aab
 
     - name: Upload artifact to Firebase App Distribution
       uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -149,6 +159,6 @@ jobs:
         appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
         serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
         groups: tester-group-android
-        file: app-release.aab
+        file: app-release.apk
 
   
