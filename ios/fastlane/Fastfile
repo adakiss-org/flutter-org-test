@@ -43,6 +43,6 @@ platform :ios do
     end
 
     # Build the IPA using Flutter
-    sh("flutter build ipa --release --export-options-plist=ios/ExportOptions.plist")
+    sh("flutter build ipa --release --export-options-plist=ExportOptions.plist")
   end
 end
