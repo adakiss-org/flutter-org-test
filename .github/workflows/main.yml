@@ -28,7 +28,7 @@ jobs:
       - name: Commit and push changes
         run: |
           git add pubspec.yaml build_number
-          git commit -m "$COMMIT_MSG"
+          git commit -m "$(cat .commit_msg)" || echo "No changes to commit"
           git push
 
 
