@@ -44,5 +44,9 @@ platform :ios do
 
     # Build the IPA using Flutter
     sh("flutter build ipa --release --export-options-plist=ExportOptions.plist")
+
+    # Cleanup
+    delete_keychain(name: "build.keychain")
+    sh("rm ~/Library/MobileDevice/Provisioning\\ Profiles/#{ENV["PROFILE_UUID"]}.mobileprovision")
   end
 end
