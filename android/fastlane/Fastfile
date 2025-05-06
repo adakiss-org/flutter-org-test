@@ -3,10 +3,7 @@ default_platform(:android)
 platform :android do
   desc "Build APK"
   lane :build_apk do
-    gradle(
-      task: "assemble",
-      build_type: "Release"
-    )
-    # extend this with android app signing
+    sh("flutter build apk")
+    # optional: add signing here if needed
   end
 end
