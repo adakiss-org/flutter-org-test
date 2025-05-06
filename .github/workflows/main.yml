@@ -22,35 +22,8 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      - name: Read current build number
-        id: read_build
-        run: |
-          if [ -f build_number ]; then
-            echo "BUILD_NUMBER=$(cat build_number)" >> $GITHUB_ENV
-          else
-            echo "BUILD_NUMBER=1" >> $GITHUB_ENV
-          fi
-
       - name: Update version and build number
-        id: update_version
-        run: |
-          VERSION_INPUT="${{ github.event.inputs.releaseVersion }}"
-          CURRENT_VERSION_LINE=$(grep '^version:' pubspec.yaml)
-
-          if [ -n "$VERSION_INPUT" ]; then
-            NEW_VERSION="$VERSION_INPUT+1"
-            sed -i "s/^version:.*/version: $NEW_VERSION/" pubspec.yaml
-            echo "1" > build_number
-            echo "COMMIT_MSG=Set version to $NEW_VERSION" >> $GITHUB_ENV
-          else
-            CURRENT_BUILD=$(cat build_number)
-            NEXT_BUILD=$((CURRENT_BUILD + 1))
-            echo "$NEXT_BUILD" > build_number
-
-            VERSION_BASE=$(echo "$CURRENT_VERSION_LINE" | cut -d'+' -f1)
-            sed -i "s/^version:.*/$VERSION_BASE+$NEXT_BUILD/" pubspec.yaml
-            echo "COMMIT_MSG=Increment build number to $NEXT_BUILD" >> $GITHUB_ENV
-          fi
+        run: bash ci/update_version.sh "${{ github.event.inputs.releaseVersion }}"
 
       - name: Commit and push changes
         run: |
