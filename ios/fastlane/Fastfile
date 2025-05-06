@@ -7,6 +7,9 @@ platform :ios do
     sh("echo $IOS_CERTIFICATE_BASE64 | base64 --decode > signing_cert.p12")
     sh("echo $IOS_PROVISIONING_PROFILE_BASE64 | base64 --decode > profile.mobileprovision")
 
+    sh("pwd")
+    sh("ls -al")
+
     # Install certificate
     create_keychain(
       name: "build.keychain",
