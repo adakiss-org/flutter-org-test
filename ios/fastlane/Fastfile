@@ -1,0 +1,38 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build IPA"
+  lane :build_ipa do
+    # Decode certificate and provisioning profile
+    sh("echo $IOS_CERTIFICATE_BASE64 | base64 --decode > signing_cert.p12")
+    sh("echo $IOS_PROVISIONING_PROFILE_BASE64 | base64 --decode > profile.mobileprovision")
+
+    # Install certificate
+    import_certificate(
+      certificate_path: "signing_cert.p12",
+      certificate_password: ENV["IOS_CERTIFICATE_PASSWORD"]
+    )
+
+    # Install provisioning profile
+    ENV["PROFILE_UUID"] = sh("uuidgen").strip
+    sh("mkdir -p ~/Library/MobileDevice/Provisioning\\ Profiles")
+    sh("cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\\ Profiles/#{ENV["PROFILE_UUID"]}.mobileprovision")
+
+    # Generate ExportOptions.plist dynamically
+    export_options = {
+      method: "ad-hoc",
+      signingStyle: "manual",
+      provisioningProfiles: {
+        ENV["IOS_BUNDLE_IDENTIFIER"] => ENV["IOS_PROVISIONING_PROFILE_NAME"]
+      },
+      teamID: ENV["IOS_TEAM_ID"]
+    }
+
+    File.open("ExportOptions.plist", "w") do |f|
+      f.write(export_options.to_plist)
+    end
+
+    # Build the IPA using Flutter
+    sh("flutter build ipa --release --export-options-plist=ios/ExportOptions.plist")
+  end
+end
